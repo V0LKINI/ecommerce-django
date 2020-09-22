@@ -41,9 +41,26 @@ def add_cart(request, product_id):
 	except Cart_Item.DoesNotExist:
 		cart_item = Cart_Item.objects.create(product=product, quantity=1, cart = cart)
 		cart_item.save()
-
 	return redirect('cart_detail')
 
+def remove_cart(request, product_id):
+	product = Product.objects.get(id=product_id)
+	cart = Cart.objects.get(cart_id=_cart_id(request))
+	cart_item = Cart_Item.objects.get(product=product, cart=cart)
+	if cart_item.quantity > 1:
+		cart_item.quantity -= 1
+		cart_item.save()
+	elif cart_item.quantity == 1:
+		cart_item.delete()
+	return redirect('cart_detail')
+
+def delete_cart(request, product_id):
+	product = Product.objects.get(id=product_id)
+	cart = Cart.objects.get(cart_id=_cart_id(request))
+	cart_item = Cart_Item.objects.get(product=product, cart=cart)
+	cart_item.delete()
+	return redirect('cart_detail')
+	
 def cart_detail(request, total=0, counter=0, cart_items=None):
 	try:
 		cart = Cart.objects.get(cart_id=_cart_id(request))
